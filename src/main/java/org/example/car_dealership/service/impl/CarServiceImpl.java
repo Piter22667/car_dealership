@@ -135,7 +135,6 @@ public class CarServiceImpl implements CarService {
         if (dto.getYear() != null) car.setYear(dto.getYear());
 
         if (dto.getImageUrls() != null) {
-            // This approach replaces all old images with the new ones.
             car.getCarImages().clear();
             List<CarImage> carImages = dto.getImageUrls().stream()
                     .map(url -> {
