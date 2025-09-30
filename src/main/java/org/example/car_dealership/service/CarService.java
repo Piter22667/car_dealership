@@ -2,8 +2,6 @@ package org.example.car_dealership.service;
 
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarListItemDto;
-import org.example.car_dealership.dto.CreateCarRequestDto;
-import org.example.car_dealership.dto.UpdateCarRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,10 +13,7 @@ public interface CarService {
 
     CarDetailsDto getCarById(Long id);
 
-    CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto);
+//    CreateCarDto createCar(CreateCarDto createCarDto);
 
-    CarDetailsDto updateCar(Long id, UpdateCarRequestDto updateCarRequestDto);
-
-    void deleteCar(Long id);
 
 }
