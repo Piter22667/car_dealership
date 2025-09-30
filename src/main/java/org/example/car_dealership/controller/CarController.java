@@ -26,8 +26,6 @@ public class CarController implements CarControllerInterface {
     @Parameter(name="page", in=ParameterIn.QUERY)
     @Parameter(name="size", in= ParameterIn.QUERY)
     @Parameter(name="sort", in= ParameterIn.QUERY)
-
-//    @PreAuthorize("hasRole('ADMIN')")
     @SecurityRequirements
     @GetMapping("/list")
     public Page<CarListItemDto> getCars(@Parameter(hidden = true) Pageable pageable) {
@@ -42,10 +40,9 @@ public class CarController implements CarControllerInterface {
     }
 
 
-
+    @SecurityRequirements
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    @SecurityRequirements
     public CarDetailsDto createCar(@RequestBody CreateCarRequestDto createCarRequestDto) {
         return carService.createCar(createCarRequestDto);
     }
