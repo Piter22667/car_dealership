@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
 
@@ -55,7 +59,10 @@ public class User implements UserDetails{
     @OneToMany(mappedBy = "userWhoChangedOrderStatus", cascade = CascadeType.ALL)
     private List<OrderStatusHistory> orderStatusHistories;
 
-
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    } //для автоматичного встановлення дати створення користувача
 
     //Userdetails interface implementation
 
