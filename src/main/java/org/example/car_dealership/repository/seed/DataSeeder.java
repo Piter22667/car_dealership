@@ -35,24 +35,24 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) {
 
         User client = new User();
-        client.setFullName("Test User");
+        client.setName("Test User");
         client.setEmail("test@example.com");
-        client.setPassword_hash("hashed_password");
-        client.setRole(Role.CLIENT);
+        client.setPassword("hashed_password");
+        client.setRole(Role.ROLE_CLIENT);
         client = userRepository.save(client);
 
         User ai = new User();
-        ai.setFullName("Open ai");
+        ai.setName("Open ai");
         ai.setEmail("openAI@ai.com");
-        ai.setPassword_hash("hashed_password");
-        ai.setRole(Role.SYSTEM);
+        ai.setPassword("hashed_password");
+        ai.setRole(Role.ROLE_SYSTEM);
         ai = userRepository.save(ai);
 
         User admin = new User();
-        admin.setFullName("Адмін Адмінович");
+        admin.setName("Адмін Адмінович");
         admin.setEmail("admin@example.com");
-        admin.setPassword_hash("hashed_password");
-        admin.setRole(Role.ADMIN);
+        admin.setPassword("hashed_password");
+        admin.setRole(Role.ROLE_ADMIN);
         admin = userRepository.save(admin);
 
         Car car1 = new Car();
@@ -103,12 +103,12 @@ public class DataSeeder implements CommandLineRunner {
 
         CarImage image1 = new CarImage();
         image1.setCar(car1);
-        image1.setImageUrl("https://example.com/car1.jpg");
+        image1.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/BMW_G07_IMG_4977.jpg/1200px-BMW_G07_IMG_4977.jpg");
         carImageRepository.save(image1);
 
         CarImage image2 = new CarImage();
         image2.setCar(car2);
-        image2.setImageUrl("https://example.com/car2.jpg");
+        image2.setImageUrl("https://olmaks.ua/wp-content/uploads/2019/05/vmesto-vydeo-2.jpg");
         carImageRepository.save(image2);
 
         ServiceHistory service1 = new ServiceHistory();

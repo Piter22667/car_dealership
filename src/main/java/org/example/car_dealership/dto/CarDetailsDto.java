@@ -1,5 +1,6 @@
 package org.example.car_dealership.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.example.car_dealership.model.config.car.Type;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@Schema(description = "Детальна інформація про автомобіль")
 public class CarDetailsDto {
     private Long id;
     private String brand;
