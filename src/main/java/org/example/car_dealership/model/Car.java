@@ -2,10 +2,15 @@ package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.example.car_dealership.model.config.car.FuelType;
 import org.example.car_dealership.model.config.car.Interior;
 import org.example.car_dealership.model.config.car.Transmission;
 import org.example.car_dealership.model.config.car.Type;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +26,7 @@ public class Car {
     @Column(length = 100)
     private String brand;
 
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     private Integer year;
@@ -74,16 +80,22 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private Interior interior;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CarImage> carImages;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ServiceHistory> serviceHistories;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TestDrive> testDrives;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Order> orders;
 
 }

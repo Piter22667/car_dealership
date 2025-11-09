@@ -3,6 +3,9 @@ package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.example.car_dealership.model.config.orders.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,9 +33,16 @@ public class Order {
     @Column(name = "total_price", precision = 12, scale = 2, nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus currentStatus;
+
+    private LocalDateTime lastChangedStatusAt;
+
     @Column(name = "requires_test_drive", nullable = false)
     private Boolean requiresTestDrive;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "order")
     private List<OrderStatusHistory> orderStatusHistory;
 }
