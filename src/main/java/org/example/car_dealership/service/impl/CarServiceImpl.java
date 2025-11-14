@@ -6,7 +6,6 @@ import org.example.car_dealership.dto.CarListItemDto;
 import org.example.car_dealership.dto.UpdateCarRequestDto;
 import org.example.car_dealership.mapper.CarMapper;
 import org.example.car_dealership.model.Car;
-import org.example.car_dealership.model.CarImage;
 import org.example.car_dealership.model.config.car.FuelType;
 import org.example.car_dealership.model.config.car.Interior;
 import org.example.car_dealership.model.config.car.Transmission;
@@ -21,8 +20,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import static org.example.car_dealership.model.config.car.ImageVariant.THUMB;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -41,7 +38,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Page<CarListItemDto> getCarList(Pageable pageable, CarFilterDto carFilterDto) {
-        Specification<Car> specification = Specification.where(carSpecification.brandLike(carFilterDto.getBrand()))
+        Specification<Car> specification = Specification.allOf(
+                carSpecification.brandLike(carFilterDto.getBrand()))
                 .and(carSpecification.minPrice(carFilterDto.getMinPrice()))
                 .and(carSpecification.maxPrice(carFilterDto.getMaxPrice()))
                 .and(carSpecification.typeLike(carFilterDto.getType()));

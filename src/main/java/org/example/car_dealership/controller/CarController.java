@@ -3,15 +3,13 @@ package org.example.car_dealership.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import org.example.car_dealership.dto.*;
-import org.example.car_dealership.model.config.car.Type;
+import org.example.car_dealership.dto.CarDetailsDto;
+import org.example.car_dealership.dto.CarFilterDto;
+import org.example.car_dealership.dto.CarListItemDto;
 import org.example.car_dealership.service.CarService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/cars")
@@ -23,9 +21,9 @@ public class CarController implements CarControllerInterface {
         this.carService = carService;
     }
 
-    @Parameter(name="page", in=ParameterIn.QUERY)
-    @Parameter(name="size", in= ParameterIn.QUERY)
-    @Parameter(name="sort", in= ParameterIn.QUERY)
+    @Parameter(name = "page", in = ParameterIn.QUERY)
+    @Parameter(name = "size", in = ParameterIn.QUERY)
+    @Parameter(name = "sort", in = ParameterIn.QUERY)
     @SecurityRequirements
     @GetMapping("/list")
     public Page<CarListItemDto> getCars(@Parameter(hidden = true) Pageable pageable,
@@ -47,7 +45,6 @@ public class CarController implements CarControllerInterface {
 //    public CarDetailsDto createCar(@RequestBody CreateCarRequestDto createCarRequestDto) {
 //        return carService.createCar(createCarRequestDto);
 //    }
-
 
 
 //    @SecurityRequirements
