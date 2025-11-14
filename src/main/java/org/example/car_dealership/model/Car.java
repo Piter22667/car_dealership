@@ -1,15 +1,11 @@
 package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.example.car_dealership.model.config.car.FuelType;
 import org.example.car_dealership.model.config.car.Interior;
 import org.example.car_dealership.model.config.car.Transmission;
 import org.example.car_dealership.model.config.car.Type;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.OnDelete;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +14,9 @@ import java.util.List;
 @Entity
 @Table(name = "cars")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +36,10 @@ public class Car {
     @Column(length = 100)
     private String manufacturer;
 
-    @Column(name = "registration_number",length = 50, unique = true)
+    @Column(name = "registration_number", length = 50, unique = true)
     private String registrationNumber;
 
-    @Column(name = "engine_volume",precision = 4, scale = 1)
+    @Column(name = "engine_volume", precision = 4, scale = 1)
     private BigDecimal engineVolume;
 
     @Column(name = "engine_power")
@@ -81,17 +80,20 @@ public class Car {
     private Interior interior;
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CarImage> carImages;
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ServiceHistory> serviceHistories;
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TestDrive> testDrives;
 

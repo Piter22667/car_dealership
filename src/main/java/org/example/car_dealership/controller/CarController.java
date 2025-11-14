@@ -3,15 +3,15 @@ package org.example.car_dealership.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import org.example.car_dealership.dto.CarDetailsDto;
-import org.example.car_dealership.dto.CarListItemDto;
-import org.example.car_dealership.dto.CreateCarRequestDto;
-import org.example.car_dealership.dto.UpdateCarRequestDto;
+import org.example.car_dealership.dto.*;
+import org.example.car_dealership.model.config.car.Type;
 import org.example.car_dealership.service.CarService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/cars")
@@ -28,8 +28,9 @@ public class CarController implements CarControllerInterface {
     @Parameter(name="sort", in= ParameterIn.QUERY)
     @SecurityRequirements
     @GetMapping("/list")
-    public Page<CarListItemDto> getCars(@Parameter(hidden = true) Pageable pageable) {
-        return carService.getCarList(pageable);
+    public Page<CarListItemDto> getCars(@Parameter(hidden = true) Pageable pageable,
+                                        @ModelAttribute CarFilterDto carFilterDto) {
+        return carService.getCarList(pageable, carFilterDto);
     }
 
 
@@ -40,27 +41,27 @@ public class CarController implements CarControllerInterface {
     }
 
 
-    @SecurityRequirements
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CarDetailsDto createCar(@RequestBody CreateCarRequestDto createCarRequestDto) {
-        return carService.createCar(createCarRequestDto);
-    }
+//    @SecurityRequirements
+//    @PostMapping("/create")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public CarDetailsDto createCar(@RequestBody CreateCarRequestDto createCarRequestDto) {
+//        return carService.createCar(createCarRequestDto);
+//    }
 
 
 
-    @SecurityRequirements
-    @PutMapping("/{id}")
-    public CarDetailsDto updateCar(@PathVariable Long id, @RequestBody UpdateCarRequestDto updateCarRequestDto) {
-        return carService.updateCar(id, updateCarRequestDto);
-    }
-
-
-
-    @SecurityRequirements
-    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCar(@PathVariable Long id) {
-        carService.deleteCar(id);
-    }
+//    @SecurityRequirements
+//    @PutMapping("/{id}")
+//    public CarDetailsDto updateCar(@PathVariable Long id, @RequestBody UpdateCarRequestDto updateCarRequestDto) {
+//        return carService.updateCar(id, updateCarRequestDto);
+//    }
+//
+//
+//
+//    @SecurityRequirements
+//    @DeleteMapping("/{id}")
+////    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteCar(@PathVariable Long id) {
+//        carService.deleteCar(id);
+//    }
 }

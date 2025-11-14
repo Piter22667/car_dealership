@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                         // * - 1 рівнень вкладення, ** - всі рівні вкладення
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cars/**").permitAll()
+                        .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
 //                        .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
