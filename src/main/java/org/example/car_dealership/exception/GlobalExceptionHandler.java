@@ -34,4 +34,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
+    @ExceptionHandler(UserWithGivenEmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleUserWithGivenEmailAlreadyExistsException(UserWithGivenEmailAlreadyExistsException ex) {
+        log.warn("User with given email already exists: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(UserWithGivenEmailForLoginNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserWithGivenEmailForLoginNotFoundException(UserWithGivenEmailForLoginNotFoundException ex) {
+        log.warn("User with given email for login not found: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    }
+
 }

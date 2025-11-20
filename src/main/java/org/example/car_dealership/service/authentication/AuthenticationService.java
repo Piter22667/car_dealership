@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.car_dealership.dto.AuthenticationRequestDto;
 import org.example.car_dealership.dto.AuthenticationResponseDto;
 import org.example.car_dealership.dto.RegisterRequestDto;
+import org.example.car_dealership.exception.UserWithGivenEmailAlreadyExistsException;
+import org.example.car_dealership.exception.UserWithGivenEmailForLoginNotFoundException;
 import org.example.car_dealership.model.User;
 import org.example.car_dealership.model.config.user.Role;
 import org.example.car_dealership.repository.UserRepository;
@@ -31,6 +33,11 @@ public class AuthenticationService {
 
 
     public AuthenticationResponseDto register(RegisterRequestDto request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserWithGivenEmailAlreadyExistsException("User with given email already exists");
+        }
+
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -41,6 +48,10 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponseDto.builder()
                 .token(jwtToken)
+                .id(user.getId())
+                .role(user.getRole().name())
+                .email(user.getEmail())
+                .name(user.getName())
                 .build();
     } // зберігаємо користувача в базі даних, генеруємо JWT токен і повертаємо його
 
@@ -53,10 +64,14 @@ public class AuthenticationService {
         );
 
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("User not found with given email."));
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponseDto.builder()
                 .token(jwtToken)
+                .id(user.getId())
+                .role(user.getRole().name())
+                .email(user.getEmail())
+                .name(user.getName())
                 .build();
     }// аутентифікуємо користувача за email та паролем і повертаємо токен
 }
