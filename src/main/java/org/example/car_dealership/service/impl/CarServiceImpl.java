@@ -3,13 +3,9 @@ package org.example.car_dealership.service.impl;
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarFilterDto;
 import org.example.car_dealership.dto.CarListItemDto;
-import org.example.car_dealership.dto.UpdateCarRequestDto;
+import org.example.car_dealership.exception.CarNotExistException;
 import org.example.car_dealership.mapper.CarMapper;
 import org.example.car_dealership.model.Car;
-import org.example.car_dealership.model.config.car.FuelType;
-import org.example.car_dealership.model.config.car.Interior;
-import org.example.car_dealership.model.config.car.Transmission;
-import org.example.car_dealership.model.config.car.Type;
 import org.example.car_dealership.repository.CarRepository;
 import org.example.car_dealership.service.CarService;
 import org.example.car_dealership.service.S3Service;
@@ -17,9 +13,7 @@ import org.example.car_dealership.specification.CarSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CarServiceImpl implements CarService {
@@ -39,7 +33,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public Page<CarListItemDto> getCarList(Pageable pageable, CarFilterDto carFilterDto) {
         Specification<Car> specification = Specification.allOf(
-                carSpecification.brandLike(carFilterDto.getBrand()))
+                        carSpecification.brandLike(carFilterDto.getBrand()))
                 .and(carSpecification.minPrice(carFilterDto.getMinPrice()))
                 .and(carSpecification.maxPrice(carFilterDto.getMaxPrice()))
                 .and(carSpecification.typeLike(carFilterDto.getType()));
@@ -53,88 +47,58 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarDetailsDto getCarById(Long id) {
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found"));
-        return toDetailsCarDto(car);
+                .orElseThrow(() -> new CarNotExistException("Car not found with given id."));
+        return carMapper.toDetailsCarDto(car);
     }
 
-    private CarDetailsDto toDetailsCarDto(Car car) {
-        CarDetailsDto dto = new CarDetailsDto();
-        dto.setId(car.getId());
-        dto.setBrand(car.getBrand());
-        dto.setModel(car.getModel());
-        dto.setManufacturer(car.getManufacturer());
-        dto.setRegistrationNumber(car.getRegistrationNumber());
-        dto.setEngineVolume(car.getEngineVolume());
-        dto.setEnginePower(car.getEnginePower());
-        dto.setFuelConsumption(car.getFuelConsumption());
-        dto.setDoors(car.getDoors());
-        dto.setSeats(car.getSeats());
-        dto.setTrunkCapacity(car.getTrunkCapacity());
-        dto.setTransmission(car.getTransmission() != null ? car.getTransmission().toString() : null);
-        dto.setCruiseControl(car.getCruiseControl());
-        dto.setFuelType(car.getFuelType() != null ? car.getFuelType().toString() : null);
-        dto.setMileage(car.getMileage());
-        dto.setLastServiceDate(car.getLastServiceDate());
-        dto.setPrice(car.getPrice());
-        dto.setColor(car.getColor());
-        dto.setInterior(car.getInterior() != null ? car.getInterior().toString() : null);
-        dto.setType(car.getType());
-        dto.setYear(car.getYear());
-//        dto.setImageUrls(
-//                car.getCarImages() != null
-//                        ? car.getCarImages().stream().map(CarImage::getImageUrl).toList()
-//                        : List.of()
-//        );
-        return dto;
-    }
 
 //    @Override
 //    public CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto) {
 //        Car car = toCarEntity(createCarRequestDto);
 //        Car savedCar = carRepository.save(car);
 //        return toDetailsCarDto(savedCar);
-//    }
+//    } //TODO finish create car method
 
-    @Override
-    public CarDetailsDto updateCar(Long id, UpdateCarRequestDto updateCarRequestDto) {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found"));
+//    @Override
+//    public CarDetailsDto updateCar(Long id, UpdateCarRequestDto updateCarRequestDto) {
+//        Car car = carRepository.findById(id)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found"));
+//
+//        updateCarFromDto(car, updateCarRequestDto);
+//        Car updatedCar = carRepository.save(car);
+//        return toDetailsCarDto(updatedCar);
+//    } //TODO finish update car method
 
-        updateCarFromDto(car, updateCarRequestDto);
-        Car updatedCar = carRepository.save(car);
-        return toDetailsCarDto(updatedCar);
-    }
+//    @Override
+//    public void deleteCar(Long id) {
+//        if (!carRepository.existsById(id)) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found");
+//        }
+//        carRepository.deleteById(id);
+//    } //TODO finish delete car mehtod
 
-    @Override
-    public void deleteCar(Long id) {
-        if (!carRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Car not found");
-        }
-        carRepository.deleteById(id);
-    }
-
-    private void updateCarFromDto(Car car, UpdateCarRequestDto dto) {
-        if (dto.getBrand() != null) car.setBrand(dto.getBrand());
-        if (dto.getModel() != null) car.setModel(dto.getModel());
-        if (dto.getManufacturer() != null) car.setManufacturer(dto.getManufacturer());
-        if (dto.getRegistrationNumber() != null) car.setRegistrationNumber(dto.getRegistrationNumber());
-        if (dto.getEngineVolume() != null) car.setEngineVolume(dto.getEngineVolume());
-        if (dto.getEnginePower() != null) car.setEnginePower(dto.getEnginePower());
-        if (dto.getFuelConsumption() != null) car.setFuelConsumption(dto.getFuelConsumption());
-        if (dto.getDoors() != null) car.setDoors(dto.getDoors());
-        if (dto.getSeats() != null) car.setSeats(dto.getSeats());
-        if (dto.getTrunkCapacity() != null) car.setTrunkCapacity(dto.getTrunkCapacity());
-        if (dto.getTransmission() != null)
-            car.setTransmission(Transmission.valueOf(dto.getTransmission().toUpperCase()));
-        if (dto.getCruiseControl() != null) car.setCruiseControl(dto.getCruiseControl());
-        if (dto.getFuelType() != null) car.setFuelType(FuelType.valueOf(dto.getFuelType().toUpperCase()));
-        if (dto.getMileage() != null) car.setMileage(dto.getMileage());
-        if (dto.getLastServiceDate() != null) car.setLastServiceDate(dto.getLastServiceDate());
-        if (dto.getPrice() != null) car.setPrice(dto.getPrice());
-        if (dto.getColor() != null) car.setColor(dto.getColor());
-        if (dto.getInterior() != null) car.setInterior(Interior.valueOf(dto.getInterior().toUpperCase()));
-        if (dto.getType() != null) car.setType(Type.valueOf(dto.getType().toUpperCase()));
-        if (dto.getYear() != null) car.setYear(dto.getYear());
+//    private void updateCarFromDto(Car car, UpdateCarRequestDto dto) {
+//        if (dto.getBrand() != null) car.setBrand(dto.getBrand());
+//        if (dto.getModel() != null) car.setModel(dto.getModel());
+//        if (dto.getManufacturer() != null) car.setManufacturer(dto.getManufacturer());
+//        if (dto.getRegistrationNumber() != null) car.setRegistrationNumber(dto.getRegistrationNumber());
+//        if (dto.getEngineVolume() != null) car.setEngineVolume(dto.getEngineVolume());
+//        if (dto.getEnginePower() != null) car.setEnginePower(dto.getEnginePower());
+//        if (dto.getFuelConsumption() != null) car.setFuelConsumption(dto.getFuelConsumption());
+//        if (dto.getDoors() != null) car.setDoors(dto.getDoors());
+//        if (dto.getSeats() != null) car.setSeats(dto.getSeats());
+//        if (dto.getTrunkCapacity() != null) car.setTrunkCapacity(dto.getTrunkCapacity());
+//        if (dto.getTransmission() != null)
+//            car.setTransmission(Transmission.valueOf(dto.getTransmission().toUpperCase()));
+//        if (dto.getCruiseControl() != null) car.setCruiseControl(dto.getCruiseControl());
+//        if (dto.getFuelType() != null) car.setFuelType(FuelType.valueOf(dto.getFuelType().toUpperCase()));
+//        if (dto.getMileage() != null) car.setMileage(dto.getMileage());
+//        if (dto.getLastServiceDate() != null) car.setLastServiceDate(dto.getLastServiceDate());
+//        if (dto.getPrice() != null) car.setPrice(dto.getPrice());
+//        if (dto.getColor() != null) car.setColor(dto.getColor());
+//        if (dto.getInterior() != null) car.setInterior(Interior.valueOf(dto.getInterior().toUpperCase()));
+//        if (dto.getType() != null) car.setType(Type.valueOf(dto.getType().toUpperCase()));
+//        if (dto.getYear() != null) car.setYear(dto.getYear());
 
 //        if (dto.getImageUrls() != null) {
 //            car.getCarImages().clear();
@@ -148,7 +112,7 @@ public class CarServiceImpl implements CarService {
 //                    .toList();
 //            car.getCarImages().addAll(carImages);
 //        }
-    }
+}
 
 //    private Car toCarEntity(CreateCarRequestDto createCarRequestDto) {
 //        Car car = new Car();
@@ -186,4 +150,4 @@ public class CarServiceImpl implements CarService {
 //        }
 //        return car;
 //    }
-}
+

@@ -8,8 +8,6 @@ services:
       - "4566:4566"
     environment:
       - SERVICES=s3
-      - DEFAULT_REGION=us-east-1
-      - EDGE_PORT=4566
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - localstack_data:/var/lib/localstack
