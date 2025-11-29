@@ -58,4 +58,44 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
+    @ExceptionHandler(CarNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleCarNotFoundException(CarNotFoundException ex) {
+        log.warn("Car not found: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    }
+
+    @ExceptionHandler(TestDriveAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleTestDriveAlreadyExistsException(TestDriveAlreadyExistsException ex) {
+        log.warn("Test drive already exists: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(TestDriveAlreadyScheduledForThisCarException.class)
+    public ResponseEntity<Map<String, String>> handleTestDriveAlreadyScheduledForThisCarException(TestDriveAlreadyScheduledForThisCarException ex) {
+        log.warn("Test drive already scheduled for this car: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(TestDriveNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTestDriveNotFoundException(TestDriveNotFoundException ex) {
+        log.warn("Test drive not found: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    }
+
+    @ExceptionHandler(TestDriveScheduleViolationException.class)
+    public ResponseEntity<Map<String, String>> handleTestDriveScheduleViolationException(TestDriveScheduleViolationException ex) {
+        log.warn("Test drive schedule violation: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
 }

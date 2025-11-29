@@ -42,12 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
         //Пропускаємо фільтри для ендпоінтів для тестування і аутентифікації
-        if (path.startsWith("/api/cars") || path.startsWith("/api/auth") ||
+        if (path.startsWith("/api/auth") ||
                 path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
                 path.equals("/error")) {
             filterChain.doFilter(request, response);
             return;
-        }
+        } //TODO очистити
 
         //Якщо заголовок існує і починається з Bearer
         jwt = authorizationHeader.substring(7); //Витягуємо токен з заголовка

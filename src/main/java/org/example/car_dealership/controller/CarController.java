@@ -6,19 +6,28 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarFilterDto;
 import org.example.car_dealership.dto.CarListItemDto;
+import org.example.car_dealership.dto.TestDriveResponseDto;
 import org.example.car_dealership.service.CarService;
+import org.example.car_dealership.service.TestDriveService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/cars")
 public class CarController implements CarControllerInterface {
 
     private final CarService carService;
+    private final TestDriveService testDriveService;
 
-    public CarController(CarService carService) {
+    public CarController(CarService carService, TestDriveService testDriveService) {
         this.carService = carService;
+        this.testDriveService = testDriveService;
     }
 
     @Parameter(name = "page", in = ParameterIn.QUERY)
@@ -36,6 +45,13 @@ public class CarController implements CarControllerInterface {
     @SecurityRequirements
     public CarDetailsDto getCarById(@PathVariable Long id) {
         return carService.getCarById(id);
+    }
+
+    @PostMapping("/testDrive/{carId}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<TestDriveResponseDto> createTestDrive(@PathVariable Long carId, Authentication authentication, @RequestParam LocalDateTime scheduledAt) {
+        TestDriveResponseDto testDrive = testDriveService.createTestDrive(authentication.getName(), carId, scheduledAt);
+        return ResponseEntity.ok(testDrive);
     }
 
 
