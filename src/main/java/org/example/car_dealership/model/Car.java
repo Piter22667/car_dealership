@@ -9,6 +9,7 @@ import org.example.car_dealership.model.config.car.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -82,22 +83,26 @@ public class Car {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
-    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<CarImage> carImages;
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<CarImage> carImages = new ArrayList<>();
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ServiceHistory> serviceHistories;
+    @Builder.Default
+    private List<ServiceHistory> serviceHistories = new ArrayList<>();
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<TestDrive> testDrives;
+    @Builder.Default
+    private List<TestDrive> testDrives = new ArrayList<>();
 
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Order> orders;
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
 
 }

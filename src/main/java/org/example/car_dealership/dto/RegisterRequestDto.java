@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.car_dealership.model.config.user.Role;
 
 @Data
 @Schema(description = "Дто для реєстрації користувача")
@@ -29,4 +30,6 @@ public class RegisterRequestDto {
     @Schema(description = "Пароль користувача", example = "Password123")
     @Size(max = 100, message = "Пароль повинен містити до 100 символів")
     private String password;
+
+    private Role role;
 }

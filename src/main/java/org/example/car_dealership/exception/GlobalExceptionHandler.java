@@ -58,4 +58,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
+    @ExceptionHandler(InvalidImageCountException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidImageCountException(InvalidImageCountException ex) {
+        log.warn("Invalid image count: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(InvalidFileFormatException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidFileFormatException(InvalidFileFormatException ex) {
+        log.warn("Invalid file format: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(CarAlreadyExistException.class)
+    public ResponseEntity<Map<String, String>> handleCarAlreadyExistException(CarAlreadyExistException ex) {
+        log.warn("Car already exist: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
 }

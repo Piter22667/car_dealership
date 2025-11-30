@@ -1,33 +1,45 @@
 package org.example.car_dealership.service.impl;
 
+import jakarta.persistence.EntityManager;
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarFilterDto;
 import org.example.car_dealership.dto.CarListItemDto;
+import org.example.car_dealership.dto.CreateCarRequestDto;
+import org.example.car_dealership.exception.CarAlreadyExistException;
 import org.example.car_dealership.exception.CarNotExistException;
 import org.example.car_dealership.mapper.CarMapper;
 import org.example.car_dealership.model.Car;
 import org.example.car_dealership.repository.CarRepository;
+import org.example.car_dealership.service.CarImageService;
 import org.example.car_dealership.service.CarService;
-import org.example.car_dealership.service.S3Service;
 import org.example.car_dealership.specification.CarSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class CarServiceImpl implements CarService {
 
     private final CarRepository carRepository;
-    private final S3Service s3Service;
     private final CarMapper carMapper;
     private final CarSpecification carSpecification;
+    private final CarImageService carImageService;
+    private final EntityManager entityManager;
 
-    public CarServiceImpl(CarRepository carRepository, S3Service s3Service, CarMapper carMapper, CarSpecification carSpecification) {
+
+    public CarServiceImpl(CarRepository carRepository, CarMapper carMapper,
+                          CarSpecification carSpecification, CarImageService carImageService, EntityManager entityManager) {
         this.carRepository = carRepository;
-        this.s3Service = s3Service;
         this.carMapper = carMapper;
         this.carSpecification = carSpecification;
+        this.carImageService = carImageService;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -41,7 +53,7 @@ public class CarServiceImpl implements CarService {
         Page<Car> page = carRepository.findAll(specification, pageable);
 
 
-        return page.map(car -> carMapper.toCarListDto(car));
+        return page.map(carMapper::toCarListDto);
     }
 
     @Override
@@ -51,6 +63,34 @@ public class CarServiceImpl implements CarService {
         return carMapper.toDetailsCarDto(car);
     }
 
+    @Override
+    @Transactional
+    public CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto, MultipartFile thumbnail, List<MultipartFile> originImages) {
+
+        if (carRepository.existsByModelAndBrand(createCarRequestDto.getModel(), createCarRequestDto.getBrand())) {
+            throw new CarAlreadyExistException("Car already exists with given model and brand.");
+
+        }
+
+        if (carRepository.existsByRegistrationNumber(createCarRequestDto.getRegistrationNumber())) {
+            throw new CarAlreadyExistException("Car already exists with given registration number.");
+        }
+
+        //  DTO -> Entity
+        Car car = carMapper.toEntity(createCarRequestDto);
+
+        Car savedCar = carRepository.save(car);
+
+        carImageService.uploadImages(savedCar.getId(), thumbnail, originImages);
+
+        entityManager.flush(); // для оновлення контексту, щоб читати щойно додані зображення
+        entityManager.clear();
+
+        Car carWithImages = carRepository.findById(savedCar.getId())
+                .orElseThrow(() -> new CarNotExistException("Car not found after creation"));
+
+        return carMapper.toDetailsCarDto(carWithImages);
+    }
 
 //    @Override
 //    public CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto) {
