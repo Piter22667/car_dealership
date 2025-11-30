@@ -67,7 +67,7 @@ public class CarServiceImpl implements CarService {
     @Transactional
     public CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto, MultipartFile thumbnail, List<MultipartFile> originImages) {
 
-        if (carRepository.existsAllByModelAndBrand(createCarRequestDto.getModel(), createCarRequestDto.getBrand())) {
+        if (carRepository.existsByModelAndBrand(createCarRequestDto.getModel(), createCarRequestDto.getBrand())) {
             throw new CarAlreadyExistException("Car already exists with given model and brand.");
 
         }
@@ -75,8 +75,6 @@ public class CarServiceImpl implements CarService {
         if (carRepository.existsByRegistrationNumber(createCarRequestDto.getRegistrationNumber())) {
             throw new CarAlreadyExistException("Car already exists with given registration number.");
         }
-
-        validateCarData(createCarRequestDto);
 
         //  DTO -> Entity
         Car car = carMapper.toEntity(createCarRequestDto);
@@ -91,23 +89,8 @@ public class CarServiceImpl implements CarService {
         Car carWithImages = carRepository.findById(savedCar.getId())
                 .orElseThrow(() -> new CarNotExistException("Car not found after creation"));
 
-        carWithImages.getCarImages().size();
-
         return carMapper.toDetailsCarDto(carWithImages);
     }
-
-    private void validateCarData(CreateCarRequestDto createCarRequestDto) {
-            // Перевірка року випуску
-        if (createCarRequestDto.getYear() > LocalDate.now().getYear() + 1) {
-            throw new IllegalArgumentException("Year cannot be in the future");
-        }
-
-            // Перевірка пробігу
-        if (createCarRequestDto.getMileage() < 0) {
-            throw new IllegalArgumentException("Mileage cannot be negative");
-        }
-    }
-
 
 //    @Override
 //    public CarDetailsDto createCar(CreateCarRequestDto createCarRequestDto) {

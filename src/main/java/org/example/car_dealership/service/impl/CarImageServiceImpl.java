@@ -112,9 +112,8 @@ public class CarImageServiceImpl implements CarImageService {
 
         String contentType = file.getContentType();
         if (contentType == null || (!contentType.equals("image/jpeg") &&
-            !contentType.equals("image/jpg") &&
             !contentType.equals("image/png"))) {
-            throw new InvalidFileFormatException("Only JPG, JPEG and PNG formats are allowed");
+            throw new InvalidFileFormatException("Only JPEG and PNG formats are allowed");
         }
     }
 

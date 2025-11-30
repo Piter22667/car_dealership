@@ -75,7 +75,7 @@ public class CreateCarRequestDto {
     private Type type;
 
     @NotNull(message = "Year is required")
-    @Min(value = 1900, message = "Year must be at least 1900")
-    @Max(value = 2100, message = "Year must not exceed 2100")
+    @Min(value = 1995, message = "Year must be at least 1995")
+    @Max(value = 2025, message = "Year must not exceed 2025")
     private Integer year;
 }
