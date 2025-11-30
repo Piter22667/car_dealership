@@ -91,8 +91,6 @@ public class CarServiceImpl implements CarService {
         Car carWithImages = carRepository.findById(savedCar.getId())
                 .orElseThrow(() -> new CarNotExistException("Car not found after creation"));
 
-        carWithImages.getCarImages().size();
-
         return carMapper.toDetailsCarDto(carWithImages);
     }
 
