@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата скасована</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cross-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .cross {
+            width: 50px;
+            height: 50px;
+            position: relative;
+        }
+
+        .cross::before,
+        .cross::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 50px;
+            background: white;
+            left: 50%;
+            top: 50%;
+            transform-origin: center;
+        }
+
+        .cross::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+            animation: drawLine1 0.3s ease-out 0.5s both;
+        }
+
+        .cross::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+            animation: drawLine2 0.3s ease-out 0.7s both;
+        }
+
+        @keyframes drawLine1 {
+            from {
+                height: 0;
+            }
+            to {
+                height: 50px;
+            }
+        }
+
+        @keyframes drawLine2 {
+            from {
+                height: 0;
+            }
+            to {
+                height: 50px;
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .cancel-message {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            color: #856404;
+            list-style-position: inside;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+
+        .btn-secondary:hover {
+            background: #fff5f7;
+        }
+
+        .sad-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            animation: swing 1s ease-in-out infinite;
+        }
+
+        @keyframes swing {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(-10deg);
+            }
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .reassurance {
+            background: #e7f3ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #004085;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cross-circle">
+            <div class="cross"></div>
+        </div>
+
+        <div class="sad-icon">😔</div>
+
+        <h1>Оплата скасована</h1>
+
+        <p class="cancel-message">
+            Ви скасували процес оплати.<br>
+            Резервацію <strong>не створено</strong>, автомобіль залишається доступним.
+        </p>
+
+        <div class="info-box">
+            <h3>💡 Що сталося?</h3>
+            <ul>
+                <li>Оплата не була завершена</li>
+                <li>Депозит не списано</li>
+                <li>Авто знову доступне для інших</li>
+            </ul>
+        </div>
+
+        <div class="reassurance">
+            <strong>Не хвилюйтеся!</strong> Ви можете спробувати знову будь-коли.<br>
+            Жодних коштів не було списано з вашого рахунку.
+        </div>
+
+        <div>
+            <a href="javascript:history.back()" class="btn">Спробувати знову</a>
+            <a href="/api/cars" class="btn btn-secondary">Переглянути каталог</a>
+        </div>
+
+        <p style="color: #888; font-size: 12px; margin-top: 30px;">
+            Якщо у вас виникли проблеми з оплатою, зв'яжіться з нашою службою підтримки:<br>
+            📧 support@cardealership.com | 📞 +380 (44) 123-45-67
+        </p>
+    </div>
+
+    <script>
+        // Логування для аналітики
+        console.log('Payment cancelled by user');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        if (sessionId) {
+            console.log('Cancelled Session ID:', sessionId);
+        }
+    </script>
+</body>
+</html>
+

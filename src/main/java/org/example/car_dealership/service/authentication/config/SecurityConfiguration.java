@@ -44,10 +44,14 @@ public class SecurityConfiguration {
                         // * - 1 рівнень вкладення, ** - всі рівні вкладення
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cars/list", "/api/cars/{id}").permitAll()
-                        .requestMatchers("/api/cars/**").hasRole("ADMIN")
+                        .requestMatchers("/api/cars/**").permitAll()
                         .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/stripe/config").permitAll()
+                        .requestMatchers("/*.html").permitAll()
+                        .requestMatchers("/orders/payment-success", "/orders/payment-cancel").permitAll()
+                        .requestMatchers("/orders/**").authenticated()
                         .anyRequest().authenticated())
                 //замінити, залежно від ендпоїнтів, які додадуться в процесі додавання логіки
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

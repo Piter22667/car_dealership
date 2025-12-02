@@ -1,7 +1,9 @@
 package org.example.car_dealership.controller;
 
+import org.example.car_dealership.dto.OrderForUserDto;
 import org.example.car_dealership.dto.TestDriveForUserDto;
 import org.example.car_dealership.dto.UserDetailsResponseDto;
+import org.example.car_dealership.service.OrderService;
 import org.example.car_dealership.service.TestDriveService;
 import org.example.car_dealership.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,12 @@ public class UserController {
 
     private final UserService userService;
     private final TestDriveService testDriveService;
+    private final OrderService orderService;
 
-    public UserController(UserService userService, TestDriveService testDriveService) {
+    public UserController(UserService userService, TestDriveService testDriveService, OrderService orderService) {
         this.userService = userService;
         this.testDriveService = testDriveService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/me")
@@ -36,5 +40,12 @@ public class UserController {
         String email = authentication.getName();
         List<TestDriveForUserDto> testDrives = testDriveService.getTestDrivesForUser(email);
         return ResponseEntity.ok(testDrives);
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderForUserDto>> getOrdersForUser(Authentication authentication) {
+        String email = authentication.getName();
+        List<OrderForUserDto> orders = orderService.getOrdersForUser(email);
+        return ResponseEntity.ok(orders);
     }
 }

@@ -108,6 +108,18 @@
             <artifactId>spring-test</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>24.3.0-beta.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
