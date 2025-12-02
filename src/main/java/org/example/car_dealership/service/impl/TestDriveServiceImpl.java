@@ -57,7 +57,15 @@ public class TestDriveServiceImpl implements TestDriveService {
                         user.getId(),
                         List.of(TestDriveStatus.SCHEDULED, TestDriveStatus.COMPLETED))
                 .ifPresent(lastTestDrive -> {
-                    LocalDateTime earliestAllowedTime = lastTestDrive.getScheduledAt().plusHours(24);
+
+                    LocalDateTime earliestAllowedTime;
+                    if (lastTestDrive.getCurrentStatus() == TestDriveStatus.COMPLETED) {
+                        earliestAllowedTime = lastTestDrive.getLastChangedStatusAt().plusHours(24);
+                    }
+                    else {
+                        earliestAllowedTime = lastTestDrive.getScheduledAt().plusHours(24);
+                    }
+
                     if (scheduledAt.isBefore(earliestAllowedTime)) {
                         throw new TestDriveScheduleViolationException(
                                 "You can schedule next test drive only 24 hours after the previous one. Earliest allowed time: " + earliestAllowedTime);

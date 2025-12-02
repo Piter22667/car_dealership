@@ -66,9 +66,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
-    @ExceptionHandler(TestDriveAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleTestDriveAlreadyExistsException(TestDriveAlreadyExistsException ex) {
-        log.warn("Test drive already exists: {}", ex.getMessage());
+
     @ExceptionHandler(InvalidImageCountException.class)
     public ResponseEntity<Map<String, String>> handleInvalidImageCountException(InvalidImageCountException ex) {
         log.warn("Invalid image count: {}", ex.getMessage());
@@ -77,9 +75,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    @ExceptionHandler(TestDriveAlreadyScheduledForThisCarException.class)
-    public ResponseEntity<Map<String, String>> handleTestDriveAlreadyScheduledForThisCarException(TestDriveAlreadyScheduledForThisCarException ex) {
-        log.warn("Test drive already scheduled for this car: {}", ex.getMessage());
+
     @ExceptionHandler(InvalidFileFormatException.class)
     public ResponseEntity<Map<String, String>> handleInvalidFileFormatException(InvalidFileFormatException ex) {
         log.warn("Invalid file format: {}", ex.getMessage());
@@ -96,9 +92,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
-    @ExceptionHandler(TestDriveScheduleViolationException.class)
-    public ResponseEntity<Map<String, String>> handleTestDriveScheduleViolationException(TestDriveScheduleViolationException ex) {
-        log.warn("Test drive schedule violation: {}", ex.getMessage());
     @ExceptionHandler(CarAlreadyExistException.class)
     public ResponseEntity<Map<String, String>> handleCarAlreadyExistException(CarAlreadyExistException ex) {
         log.warn("Car already exist: {}", ex.getMessage());
