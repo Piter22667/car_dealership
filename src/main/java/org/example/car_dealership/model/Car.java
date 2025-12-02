@@ -2,10 +2,7 @@ package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.car_dealership.model.config.car.FuelType;
-import org.example.car_dealership.model.config.car.Interior;
-import org.example.car_dealership.model.config.car.Transmission;
-import org.example.car_dealership.model.config.car.Type;
+import org.example.car_dealership.model.config.car.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -79,6 +76,16 @@ public class Car {
 
     @Enumerated(EnumType.STRING)
     private Interior interior;
+
+    @Version
+    @Builder.Default
+    private Long version = 0L;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Builder.Default
+    private CarStatus status = CarStatus.AVAILABLE;
+
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

@@ -48,6 +48,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/stripe/config").permitAll()
+                        .requestMatchers("/*.html").permitAll()
+                        .requestMatchers("/orders/payment-success", "/orders/payment-cancel").permitAll()
+                        .requestMatchers("/orders/**").authenticated()
                         .anyRequest().authenticated())
                 //замінити, залежно від ендпоїнтів, які додадуться в процесі додавання логіки
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

@@ -82,4 +82,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
+    @ExceptionHandler(CarNotAvailableException.class)
+    public ResponseEntity<Map<String, String>> handleCarNotAvailableException(CarNotAvailableException ex) {
+        log.warn("Car not available: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
 }

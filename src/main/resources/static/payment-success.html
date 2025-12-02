@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата успішна!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkmark-circle {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .checkmark {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 4;
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #667eea;
+            animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+        }
+
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .success-message {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #888;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .car-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="checkmark-circle">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark-circle-bg" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+        </div>
+
+        <div class="car-icon">🚗</div>
+
+        <h1>Оплата успішна!</h1>
+
+        <p class="success-message">
+            Ваш депозит у розмірі <strong>$100</strong> успішно оплачено.<br>
+            Автомобіль заброньовано на ваше ім'я.
+        </p>
+
+        <div class="info-box">
+            <div class="info-item">
+                <span class="info-label">Депозит:</span>
+                <span class="info-value">$100.00</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Резервація діє:</span>
+                <span class="info-value">7 днів</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Статус:</span>
+                <span class="info-value" style="color: #28a745;">✓ Підтверджено</span>
+            </div>
+        </div>
+
+        <p style="color: #888; font-size: 14px; margin-bottom: 20px;">
+            Деталі замовлення надіслано на вашу електронну пошту.<br>
+            Наш менеджер зв'яжеться з вами найближчим часом.
+        </p>
+
+        <div>
+            <a href="/api/cars" class="btn">Переглянути інші авто</a>
+            <a href="/api/orders/my-orders" class="btn btn-secondary">Мої замовлення</a>
+        </div>
+    </div>
+
+    <script>
+        // Отримання session_id з URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (sessionId) {
+            console.log('Payment Session ID:', sessionId);
+
+            // Перевіряємо, чи вже оброблявся цей session_id
+            const processedKey = `payment_processed_${sessionId}`;
+            const alreadyProcessed = sessionStorage.getItem(processedKey);
+
+            if (!alreadyProcessed) {
+                // Відправка запиту на бекенд для обробки успішної оплати (тільки перший раз)
+                fetch(`/orders/payment-success?session_id=${sessionId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Помилка обробки оплати');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log('Payment processed:', data);
+                        // Зберігаємо в sessionStorage, що цей платіж вже оброблено
+                        sessionStorage.setItem(processedKey, 'true');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Виникла помилка при обробці оплати. Зв\'яжіться з підтримкою.');
+                    });
+            } else {
+                console.log('Payment already processed for this session');
+            }
+        }
+
+    </script>
+</body>
+</html>
