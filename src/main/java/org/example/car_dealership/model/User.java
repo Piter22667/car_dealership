@@ -1,11 +1,9 @@
 package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.car_dealership.model.config.user.Role;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,28 +39,32 @@ public class User implements UserDetails{
     @Column(nullable = false)
     private Role role;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "senderUser")
     private List<ChatMessage> chatMessages;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "user")
     private List<TestDrive> testDrives;
 
-    @OneToMany(mappedBy = "userWhoChangedTestDriveStatus", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "userWhoChangedTestDriveStatus")
     private List<TestDriveStatusHistory> testDriveStatusHistories;
 
-    @OneToMany(mappedBy = "userWhoChangedOrderStatus", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "userWhoChangedOrderStatus")
     private List<OrderStatusHistory> orderStatusHistories;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    } //для автоматичного встановлення дати створення користувача
 
     //Userdetails interface implementation
 

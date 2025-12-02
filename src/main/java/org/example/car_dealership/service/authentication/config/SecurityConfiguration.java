@@ -43,10 +43,12 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request -> request
                         // * - 1 рівнень вкладення, ** - всі рівні вкладення
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/cars/**").permitAll()
+                        .requestMatchers("/api/chat").permitAll()
+                        .requestMatchers("/api/cars/list", "/api/cars/{id}").permitAll()
+                        .requestMatchers("/api/cars/**").hasRole("ADMIN")
+                        .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()
-//                        .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 //замінити, залежно від ендпоїнтів, які додадуться в процесі додавання логіки
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

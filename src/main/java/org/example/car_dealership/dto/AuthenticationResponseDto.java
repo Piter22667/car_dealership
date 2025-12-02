@@ -15,4 +15,12 @@ public class AuthenticationResponseDto {
 
     @Schema(description = "Токен доступу", example = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYyMjUwNj...")
     private String token;
+
+    private Long id;
+
+    private String role;
+
+    private String email;
+
+    private String name;
 }

@@ -8,5 +8,4 @@ public enum Type {
     PICKUP,
     MINIVAN,
     WAGON
-
 }

@@ -14,7 +14,7 @@ public class ServiceHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 

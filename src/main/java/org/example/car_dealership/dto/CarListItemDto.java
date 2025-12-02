@@ -11,8 +11,9 @@ public class CarListItemDto {
     private Long id;
     private String title;
     private Type type;
-    private Integer year;
-    private Integer mileage;
     private BigDecimal price;
-    private String imageUrl;
+    private String thumbUrl;
 }
+
+//cars/{carId}/thumb/uuui
+//cars/{carId}/origin/uuui.jpg
