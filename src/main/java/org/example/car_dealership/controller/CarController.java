@@ -3,10 +3,12 @@ package org.example.car_dealership.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.validation.Valid;
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarFilterDto;
 import org.example.car_dealership.dto.CarListItemDto;
 import org.example.car_dealership.dto.TestDriveResponseDto;
+import org.example.car_dealership.dto.CreateCarRequestDto;
 import org.example.car_dealership.service.CarService;
 import org.example.car_dealership.service.TestDriveService;
 import org.springframework.data.domain.Page;
@@ -14,7 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import java.time.LocalDateTime;
 
@@ -55,12 +63,16 @@ public class CarController implements CarControllerInterface {
     }
 
 
-//    @SecurityRequirements
-//    @PostMapping("/create")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public CarDetailsDto createCar(@RequestBody CreateCarRequestDto createCarRequestDto) {
-//        return carService.createCar(createCarRequestDto);
-//    }
+    @PostMapping(value = "/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public CarDetailsDto createCar(
+            @Valid @ModelAttribute CreateCarRequestDto createCarRequestDto,
+            @RequestParam("thumbnail") MultipartFile thumbnail,
+            @RequestParam("originImages") List<MultipartFile> originImages) {
+        return carService.createCar(createCarRequestDto, thumbnail, originImages);
+    }
+
 
 
 //    @SecurityRequirements

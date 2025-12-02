@@ -2,6 +2,7 @@ package org.example.car_dealership.mapper;
 
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarListItemDto;
+import org.example.car_dealership.dto.CreateCarRequestDto;
 import org.example.car_dealership.model.Car;
 import org.example.car_dealership.model.CarImage;
 import org.example.car_dealership.service.S3Service;
@@ -79,5 +80,30 @@ public class CarMapper {
                 .collect(Collectors.toList());
         dto.setImageUrls(imageUrls);
         return dto;
+    }
+
+    public Car toEntity(CreateCarRequestDto dto) {
+        return Car.builder()
+                .brand(dto.getBrand())
+                .model(dto.getModel())
+                .manufacturer(dto.getManufacturer())
+                .registrationNumber(dto.getRegistrationNumber())
+                .engineVolume(dto.getEngineVolume())
+                .enginePower(dto.getEnginePower())
+                .fuelConsumption(dto.getFuelConsumption())
+                .doors(dto.getDoors())
+                .seats(dto.getSeats())
+                .trunkCapacity(dto.getTrunkCapacity())
+                .transmission(dto.getTransmission())
+                .cruiseControl(dto.getCruiseControl())
+                .fuelType(dto.getFuelType())
+                .mileage(dto.getMileage())
+                .lastServiceDate(dto.getLastServiceDate())
+                .price(dto.getPrice())
+                .color(dto.getColor())
+                .interior(dto.getInterior())
+                .type(dto.getType())
+                .year(dto.getYear())
+                .build();
     }
 }
