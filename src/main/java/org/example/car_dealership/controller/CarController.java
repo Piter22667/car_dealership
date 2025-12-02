@@ -5,23 +5,15 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Future;
-import org.example.car_dealership.dto.CarDetailsDto;
-import org.example.car_dealership.dto.CarFilterDto;
-import org.example.car_dealership.dto.CarListItemDto;
-import org.example.car_dealership.dto.TestDriveRequestDto;
-import org.example.car_dealership.dto.TestDriveResponseDto;
-import org.example.car_dealership.dto.CreateCarRequestDto;
+import org.example.car_dealership.dto.*;
 import org.example.car_dealership.service.CarService;
 import org.example.car_dealership.service.TestDriveService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,7 +54,7 @@ public class CarController implements CarControllerInterface {
             @PathVariable Long carId,
             Authentication authentication,
             @RequestBody(description = "Test drive scheduling details", required = true)
-            @Valid @org.springframework.web.bind.annotation.RequestBody TestDriveRequestDto requestDto) {
+            @Valid TestDriveRequestDto requestDto) {
         TestDriveResponseDto testDrive = testDriveService.createTestDrive(
                 authentication.getName(),
                 carId,
@@ -80,7 +72,6 @@ public class CarController implements CarControllerInterface {
             @RequestParam("originImages") List<MultipartFile> originImages) {
         return carService.createCar(createCarRequestDto, thumbnail, originImages);
     }
-
 
 
 //    @SecurityRequirements
