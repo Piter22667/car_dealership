@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.equals("/error")) {
             filterChain.doFilter(request, response);
             return;
-        }
+        } //TODO очистити
 
         //Якщо заголовок існує і починається з Bearer
         jwt = authorizationHeader.substring(7); //Витягуємо токен з заголовка
