@@ -2,18 +2,18 @@ package org.example.car_dealership.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
-import org.example.car_dealership.dto.CarDetailsDto;
-import org.example.car_dealership.dto.CarFilterDto;
-import org.example.car_dealership.dto.CarListItemDto;
-import org.example.car_dealership.dto.CreateCarRequestDto;
+import org.example.car_dealership.dto.*;
 import org.example.car_dealership.service.CarService;
+import org.example.car_dealership.service.TestDriveService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +24,11 @@ import java.util.List;
 public class CarController implements CarControllerInterface {
 
     private final CarService carService;
+    private final TestDriveService testDriveService;
 
-    public CarController(CarService carService) {
+    public CarController(CarService carService, TestDriveService testDriveService) {
         this.carService = carService;
+        this.testDriveService = testDriveService;
     }
 
     @Parameter(name = "page", in = ParameterIn.QUERY)
@@ -46,6 +48,20 @@ public class CarController implements CarControllerInterface {
         return carService.getCarById(id);
     }
 
+    @PostMapping("/testDrive/{carId}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<TestDriveResponseDto> createTestDrive(
+            @PathVariable Long carId,
+            Authentication authentication,
+            @RequestBody(description = "Test drive scheduling details", required = true)
+            @Valid TestDriveRequestDto requestDto) {
+        TestDriveResponseDto testDrive = testDriveService.createTestDrive(
+                authentication.getName(),
+                carId,
+                requestDto.getScheduledAt());
+        return ResponseEntity.status(HttpStatus.CREATED).body(testDrive);
+    }
+
 
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -56,7 +72,6 @@ public class CarController implements CarControllerInterface {
             @RequestParam("originImages") List<MultipartFile> originImages) {
         return carService.createCar(createCarRequestDto, thumbnail, originImages);
     }
-
 
 
 //    @SecurityRequirements

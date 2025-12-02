@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.debug("JWT Filter: Public endpoint, skipping authentication");
             filterChain.doFilter(request, response);
             return;
-        }
+        } //TODO очистити
 
         //Якщо заголовок існує і починається з Bearer
         jwt = authorizationHeader.substring(7); //Витягуємо токен з заголовка
