@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
 import org.example.car_dealership.dto.CarDetailsDto;
 import org.example.car_dealership.dto.CarFilterDto;
 import org.example.car_dealership.dto.CarListItemDto;
@@ -58,15 +59,15 @@ public class CarController implements CarControllerInterface {
     @PostMapping("/testDrive/{carId}")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<TestDriveResponseDto> createTestDrive(
-            @PathVariable Long carId, 
-            Authentication authentication, 
+            @PathVariable Long carId,
+            Authentication authentication,
             @RequestBody(description = "Test drive scheduling details", required = true)
             @Valid @org.springframework.web.bind.annotation.RequestBody TestDriveRequestDto requestDto) {
         TestDriveResponseDto testDrive = testDriveService.createTestDrive(
-                authentication.getName(), 
-                carId, 
+                authentication.getName(),
+                carId,
                 requestDto.getScheduledAt());
-        return ResponseEntity.ok(testDrive);
+        return ResponseEntity.status(HttpStatus.CREATED).body(testDrive);
     }
 
 

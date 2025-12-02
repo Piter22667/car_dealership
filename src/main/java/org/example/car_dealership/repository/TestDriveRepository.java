@@ -17,7 +17,9 @@ public interface TestDriveRepository extends JpaRepository<TestDrive, Long> {
                                           @Param("status") TestDriveStatus status);
 
 
-    boolean existsByUserIdAndCarId(Long userId, Long carId);
+    boolean existsByUserIdAndCarIdAndCurrentStatusIn(Long userId, Long carId, List<TestDriveStatus> statuses);
+
+//    boolean existsByUserIdAndCarId(Long userId, Long carId);
 
     List<TestDrive> findByUserId(Long id);
 

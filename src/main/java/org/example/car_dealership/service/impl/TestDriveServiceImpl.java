@@ -15,6 +15,7 @@ import org.example.car_dealership.repository.TestDriveRepository;
 import org.example.car_dealership.repository.TestDriveStatusHistoryRepository;
 import org.example.car_dealership.repository.UserRepository;
 import org.example.car_dealership.service.TestDriveService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +43,22 @@ public class TestDriveServiceImpl implements TestDriveService {
     @Override
     @Transactional
     public TestDriveResponseDto createTestDrive(String clientEmail, Long carId, LocalDateTime scheduledAt) {
+
+        if (scheduledAt == null || scheduledAt.isAfter(LocalDateTime.now())) {
+            throw new TestDriveScheduleViolationException("Scheduled time must be in future.");
+        }
+
         User user = userRepository.findByEmail(clientEmail)
                 .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("User not found with given email."));
 
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new CarNotFoundException("Car not found with given id."));
+        Car car = carRepository.findByIdWithLock(carId)
+                .orElseThrow(() -> new CarNotExistException("Car not found with given id."));
 
-        if (testDriveRepository.existsByUserIdAndCarId(user.getId(), car.getId())) {
-            throw new TestDriveAlreadyExistsException("Test drive already exists for this car by current user.");
+        if (testDriveRepository.existsByUserIdAndCarIdAndCurrentStatusIn(
+                user.getId(),
+                car.getId(),
+                List.of(TestDriveStatus.SCHEDULED))) {
+            throw new TestDriveAlreadyExistsException("An active test drive already exists for this car by current user.");
         }
 
 
@@ -61,8 +70,7 @@ public class TestDriveServiceImpl implements TestDriveService {
                     LocalDateTime earliestAllowedTime;
                     if (lastTestDrive.getCurrentStatus() == TestDriveStatus.COMPLETED) {
                         earliestAllowedTime = lastTestDrive.getLastChangedStatusAt().plusHours(24);
-                    }
-                    else {
+                    } else {
                         earliestAllowedTime = lastTestDrive.getScheduledAt().plusHours(24);
                     }
 
@@ -86,7 +94,12 @@ public class TestDriveServiceImpl implements TestDriveService {
         testDrive.setCurrentStatus(TestDriveStatus.SCHEDULED);
         testDrive.setLastChangedStatusAt(LocalDateTime.now());
 
-        testDrive = testDriveRepository.save(testDrive);
+        try {
+            testDrive = testDriveRepository.save(testDrive);
+        } catch (DataIntegrityViolationException e) {
+            throw new TestDriveAlreadyScheduledForThisCarException(
+                    "Test drive already scheduled for this car.");
+        }
 
         TestDriveStatusHistory testDriveStatusHistory = new TestDriveStatusHistory();
         testDriveStatusHistory.setTestDrive(testDrive);

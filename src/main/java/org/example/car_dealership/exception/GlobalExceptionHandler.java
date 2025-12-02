@@ -58,15 +58,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
     }
 
-    @ExceptionHandler(CarNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleCarNotFoundException(CarNotFoundException ex) {
-        log.warn("Car not found: {}", ex.getMessage());
-        Map<String, String> errors = new HashMap<>();
-        errors.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
-    }
-
-
     @ExceptionHandler(InvalidImageCountException.class)
     public ResponseEntity<Map<String, String>> handleInvalidImageCountException(InvalidImageCountException ex) {
         log.warn("Invalid image count: {}", ex.getMessage());
