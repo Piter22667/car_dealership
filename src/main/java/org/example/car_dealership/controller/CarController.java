@@ -2,6 +2,7 @@ package org.example.car_dealership.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.example.car_dealership.dto.CarDetailsDto;
@@ -59,7 +60,8 @@ public class CarController implements CarControllerInterface {
     public ResponseEntity<TestDriveResponseDto> createTestDrive(
             @PathVariable Long carId, 
             Authentication authentication, 
-            @Valid @RequestBody TestDriveRequestDto requestDto) {
+            @RequestBody(description = "Test drive scheduling details", required = true)
+            @Valid @org.springframework.web.bind.annotation.RequestBody TestDriveRequestDto requestDto) {
         TestDriveResponseDto testDrive = testDriveService.createTestDrive(
                 authentication.getName(), 
                 carId, 
