@@ -3,9 +3,13 @@ package org.example.car_dealership.service.impl;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import lombok.extern.slf4j.Slf4j;
+import org.example.car_dealership.dto.OrderForUserDto;
 import org.example.car_dealership.dto.StripeResponseDto;
 import org.example.car_dealership.exception.CarNotAvailableException;
 import org.example.car_dealership.exception.CarNotExistException;
+import org.example.car_dealership.exception.OrderNotFoundException;
+import org.example.car_dealership.exception.UserWithGivenEmailForLoginNotFoundException;
+import org.example.car_dealership.mapper.OrderMapper;
 import org.example.car_dealership.model.Car;
 import org.example.car_dealership.model.Order;
 import org.example.car_dealership.model.OrderStatusHistory;
@@ -17,29 +21,33 @@ import org.example.car_dealership.repository.CarRepository;
 import org.example.car_dealership.repository.OrderRepository;
 import org.example.car_dealership.repository.OrderStatusHistoryRepository;
 import org.example.car_dealership.repository.UserRepository;
+import org.example.car_dealership.service.OrderService;
 import org.example.car_dealership.service.StripeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
-public class OrderServiceImpl {
+public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CarRepository carRepository;
     private final StripeService stripeService;
     private final UserRepository userRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final OrderMapper orderMapper;
 
-    public OrderServiceImpl(OrderRepository orderRepository, CarRepository carRepository, StripeService stripeService, UserRepository userRepository, OrderStatusHistoryRepository orderStatusHistoryRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, CarRepository carRepository, StripeService stripeService, UserRepository userRepository, OrderStatusHistoryRepository orderStatusHistoryRepository, OrderMapper orderMapper) {
         this.orderRepository = orderRepository;
         this.carRepository = carRepository;
         this.stripeService = stripeService;
         this.userRepository = userRepository;
         this.orderStatusHistoryRepository = orderStatusHistoryRepository;
+        this.orderMapper = orderMapper;
     }
 
     public StripeResponseDto createOrderReservation(Long carId, String userEmail) {
@@ -128,6 +136,24 @@ public class OrderServiceImpl {
         log.info("Car status updated to RESERVED: carId={}", carId);
     }
 
+    @Override
+    public List<OrderForUserDto> getOrdersForUser(String userEmail) {
+        log.info("Fetching orders for user: {}", userEmail);
+
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() ->
+                new UserWithGivenEmailForLoginNotFoundException("User not found with given email"));
+
+        List<Order> orders = orderRepository.findOrderByUserId(user.getId());
+
+        if (orders == null || orders.isEmpty()) {
+            log.info("No orders found for user: {}", userEmail);
+            return List.of();
+        }
+
+        log.info("Found {} orders for user: {}", orders.size(), userEmail);
+        return orderMapper.toOrderForUserDtoList(orders);
+    }
+
     private void createOrderStatusHistory(Order order, OrderStatus status, User user) {
         OrderStatusHistory statusHistory = new OrderStatusHistory();
         statusHistory.setOrder(order);
@@ -137,6 +163,6 @@ public class OrderServiceImpl {
 
         orderStatusHistoryRepository.save(statusHistory);
         log.info("Order status history created: orderId={}, status={}, changedBy={}",
-                 order.getId(), status, user.getEmail());
+                order.getId(), status, user.getEmail());
     }
 }

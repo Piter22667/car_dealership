@@ -9,13 +9,13 @@ import org.example.car_dealership.model.Car;
 import org.example.car_dealership.model.TestDrive;
 import org.example.car_dealership.model.TestDriveStatusHistory;
 import org.example.car_dealership.model.User;
+import org.example.car_dealership.model.config.car.CarStatus;
 import org.example.car_dealership.model.config.testDrive.TestDriveStatus;
 import org.example.car_dealership.repository.CarRepository;
 import org.example.car_dealership.repository.TestDriveRepository;
 import org.example.car_dealership.repository.TestDriveStatusHistoryRepository;
 import org.example.car_dealership.repository.UserRepository;
 import org.example.car_dealership.service.TestDriveService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,15 +44,13 @@ public class TestDriveServiceImpl implements TestDriveService {
     @Transactional
     public TestDriveResponseDto createTestDrive(String clientEmail, Long carId, LocalDateTime scheduledAt) {
 
-        if (scheduledAt == null || scheduledAt.isAfter(LocalDateTime.now())) {
-            throw new TestDriveScheduleViolationException("Scheduled time must be in future.");
-        }
 
         User user = userRepository.findByEmail(clientEmail)
                 .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("User not found with given email."));
 
         Car car = carRepository.findByIdWithLock(carId)
                 .orElseThrow(() -> new CarNotExistException("Car not found with given id."));
+
 
         if (testDriveRepository.existsByUserIdAndCarIdAndCurrentStatusIn(
                 user.getId(),
@@ -61,6 +59,14 @@ public class TestDriveServiceImpl implements TestDriveService {
             throw new TestDriveAlreadyExistsException("An active test drive already exists for this car by current user.");
         }
 
+        if (car.getStatus() == CarStatus.RESERVED_FOR_TEST_DRIVE) {
+            throw new CarNotAvailableException("This car is already reserved for test drive by another user.");
+        }
+
+        // Перевірка: чи автомобіль доступний взагалі
+        if (car.getStatus() != CarStatus.AVAILABLE) {
+            throw new CarNotAvailableException("This car is not available for test drive. Current status: " + car.getStatus());
+        }
 
         testDriveRepository.findTopByUserIdAndCurrentStatusInOrderByScheduledAtDesc(
                         user.getId(),
@@ -81,11 +87,11 @@ public class TestDriveServiceImpl implements TestDriveService {
                 });
 
 
-        boolean alreadyScheduled = testDriveRepository.existsByCarIdAndCurrentStatus(carId, TestDriveStatus.SCHEDULED);
-        log.info("Car {} already scheduled: {}", carId, alreadyScheduled);
-        if (alreadyScheduled) {
-            throw new TestDriveAlreadyScheduledForThisCarException("Test drive already scheduled for this car.");
-        }
+        // Змінюємо статус автомобіля на RESERVED_FOR_TEST_DRIVE
+        car.setStatus(CarStatus.RESERVED_FOR_TEST_DRIVE);
+        carRepository.save(car);
+        log.info("Car status changed to RESERVED_FOR_TEST_DRIVE for car: {}", carId);
+
 
         TestDrive testDrive = new TestDrive();
         testDrive.setUser(user);
@@ -94,12 +100,7 @@ public class TestDriveServiceImpl implements TestDriveService {
         testDrive.setCurrentStatus(TestDriveStatus.SCHEDULED);
         testDrive.setLastChangedStatusAt(LocalDateTime.now());
 
-        try {
-            testDrive = testDriveRepository.save(testDrive);
-        } catch (DataIntegrityViolationException e) {
-            throw new TestDriveAlreadyScheduledForThisCarException(
-                    "Test drive already scheduled for this car.");
-        }
+        testDrive = testDriveRepository.save(testDrive);
 
         TestDriveStatusHistory testDriveStatusHistory = new TestDriveStatusHistory();
         testDriveStatusHistory.setTestDrive(testDrive);

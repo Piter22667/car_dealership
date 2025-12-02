@@ -5,5 +5,5 @@ public enum CarStatus {
     RESERVED_PENDING, //в процесі бронювання для покупки
     RESERVED, //заброньовано для покупки
     SOLD,
-//    ON_TEST_DRIVE TODO чи додавати статус на тест драйві?
+    RESERVED_FOR_TEST_DRIVE
 }
