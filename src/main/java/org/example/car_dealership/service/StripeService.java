@@ -2,7 +2,9 @@ package org.example.car_dealership.service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.example.car_dealership.dto.StripeResponseDto;
@@ -93,6 +95,21 @@ public class StripeService {
         Session session = Session.retrieve(sessionId);
         log.info("Session retrieved successfully: sessionId={}, paymentStatus={}", sessionId, session.getPaymentStatus());
         return session;
+    }
+
+    public Refund refundPayment(String paymentIntentId) throws StripeException {
+        log.info("Initiating refund for paymentIntentId={}", paymentIntentId);
+        Stripe.apiKey = secretKey;
+
+        RefundCreateParams params = RefundCreateParams.builder()
+                .setPaymentIntent(paymentIntentId)
+                .build();
+
+        Refund refund = Refund.create(params);
+        log.info("Refund created successfully: refundId={}, amount={}, status={}", 
+                refund.getId(), refund.getAmount(), refund.getStatus());
+        
+        return refund;
     }
 
 }

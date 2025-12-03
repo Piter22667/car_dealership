@@ -1,6 +1,7 @@
 package org.example.car_dealership.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.car_dealership.dto.TestDriveAdminDto;
 import org.example.car_dealership.dto.TestDriveForUserDto;
 import org.example.car_dealership.dto.TestDriveResponseDto;
 import org.example.car_dealership.exception.*;
@@ -127,5 +128,120 @@ public class TestDriveServiceImpl implements TestDriveService {
         }
 
         return testDriveMapper.toTestDriveForUserDtoList(testDrives);
+    }
+
+    @Override
+    public List<TestDriveAdminDto> getAllTestDrives() {
+        log.info("Fetching all test drives");
+        List<TestDrive> testDrives = testDriveRepository.findAll();
+        log.info("Found {} test drives", testDrives.size());
+        return testDriveMapper.toTestDriveAdminDtoList(testDrives);
+    }
+
+    @Override
+    @Transactional
+    public TestDriveAdminDto approveTestDrive(Long testDriveId, String adminEmail) {
+        log.info("Admin approving test drive: testDriveId={}, adminEmail={}", testDriveId, adminEmail);
+
+        TestDrive testDrive = testDriveRepository.findById(testDriveId)
+                .orElseThrow(() -> new TestDriveNotFoundException("Test drive not found with id: " + testDriveId));
+
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("Admin not found"));
+
+        if (testDrive.getCurrentStatus() != TestDriveStatus.SCHEDULED) {
+            throw new IllegalStateException("Can only approve scheduled test drives");
+        }
+
+        Car car = carRepository.findById(testDrive.getCar().getId())
+                .orElseThrow(() -> new CarNotExistException("Car not found with given id."));
+
+        car.setStatus(CarStatus.RESERVED_FOR_TEST_DRIVE);
+        carRepository.save(car);
+
+        testDrive.setCurrentStatus(TestDriveStatus.APPROVED);
+        testDrive.setLastChangedStatusAt(LocalDateTime.now());
+
+        createTestDriveStatusHistory(testDrive, TestDriveStatus.APPROVED, admin);
+
+        TestDrive saved = testDriveRepository.save(testDrive);
+        log.info("Test drive approved: testDriveId={}", testDriveId);
+        return testDriveMapper.toTestDriveAdminDto(saved);
+    }
+
+    @Override
+    @Transactional
+    public TestDriveAdminDto cancelTestDrive(Long testDriveId, String adminEmail) {
+        log.info("Admin canceling test drive: testDriveId={}, adminEmail={}", testDriveId, adminEmail);
+
+        TestDrive testDrive = testDriveRepository.findById(testDriveId)
+                .orElseThrow(() -> new TestDriveNotFoundException("Test drive not found with id: " + testDriveId));
+
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("Admin not found"));
+
+        if (testDrive.getCurrentStatus() == TestDriveStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot cancel completed test drive");
+        }
+
+        if (testDrive.getCurrentStatus() == TestDriveStatus.CANCELED) {
+            throw new IllegalStateException("Test drive is already canceled");
+        }
+
+        testDrive.setCurrentStatus(TestDriveStatus.CANCELED);
+        testDrive.setLastChangedStatusAt(LocalDateTime.now());
+
+        Car car = testDrive.getCar();
+        car.setStatus(CarStatus.AVAILABLE);
+        carRepository.save(car);
+        log.info("Car status changed to AVAILABLE: carId={}", car.getId());
+
+        createTestDriveStatusHistory(testDrive, TestDriveStatus.CANCELED, admin);
+
+        TestDrive saved = testDriveRepository.save(testDrive);
+        log.info("Test drive canceled: testDriveId={}", testDriveId);
+        return testDriveMapper.toTestDriveAdminDto(saved);
+    }
+
+    @Override
+    @Transactional
+    public TestDriveAdminDto completeTestDrive(Long testDriveId, String adminEmail) {
+        log.info("Admin completing test drive: testDriveId={}, adminEmail={}", testDriveId, adminEmail);
+
+        TestDrive testDrive = testDriveRepository.findById(testDriveId)
+                .orElseThrow(() -> new TestDriveNotFoundException("Test drive not found with id: " + testDriveId));
+
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new UserWithGivenEmailForLoginNotFoundException("Admin not found"));
+
+        if (testDrive.getCurrentStatus() != TestDriveStatus.SCHEDULED && testDrive.getCurrentStatus() != TestDriveStatus.APPROVED) {
+            throw new IllegalStateException("Can only complete scheduled test drives");
+        }
+
+        testDrive.setCurrentStatus(TestDriveStatus.COMPLETED);
+        testDrive.setLastChangedStatusAt(LocalDateTime.now());
+
+        Car car = testDrive.getCar();
+        car.setStatus(CarStatus.AVAILABLE);
+        carRepository.save(car);
+        log.info("Car status changed to AVAILABLE: carId={}", car.getId());
+
+        createTestDriveStatusHistory(testDrive, TestDriveStatus.COMPLETED, admin);
+
+        TestDrive saved = testDriveRepository.save(testDrive);
+        log.info("Test drive completed: testDriveId={}", testDriveId);
+        return testDriveMapper.toTestDriveAdminDto(saved);
+    }
+
+    private void createTestDriveStatusHistory(TestDrive testDrive, TestDriveStatus status, User user) {
+        TestDriveStatusHistory statusHistory = new TestDriveStatusHistory();
+        statusHistory.setTestDrive(testDrive);
+        statusHistory.setUserWhoChangedTestDriveStatus(user);
+        statusHistory.setStatus(status);
+        statusHistory.setChangedAt(LocalDateTime.now());
+
+        testDriveStatusHistoryRepository.save(statusHistory);
+        log.info("Test drive status history created: testDriveId={}, status={}, changedBy={}",
+                testDrive.getId(), status, user.getEmail());
     }
 }

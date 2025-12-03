@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                         // * - 1 рівнень вкладення, ** - всі рівні вкладення
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cars/list", "/api/cars/{id}").permitAll()
-                        .requestMatchers("/api/cars/**").permitAll()
+                        .requestMatchers("/api/cars/**").authenticated()
                         .requestMatchers("/api/s3/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/error").permitAll()

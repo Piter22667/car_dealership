@@ -2,8 +2,11 @@ package org.example.car_dealership.service.impl;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.car_dealership.dto.OrderAdminDto;
 import org.example.car_dealership.dto.OrderForUserDto;
+import org.example.car_dealership.dto.OrderResponseDto;
 import org.example.car_dealership.dto.StripeResponseDto;
 import org.example.car_dealership.exception.CarNotAvailableException;
 import org.example.car_dealership.exception.CarNotExistException;
@@ -165,4 +168,115 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order status history created: orderId={}, status={}, changedBy={}",
                 order.getId(), status, user.getEmail());
     }
+
+    @Override
+    @Transactional
+    public OrderAdminDto adminCancelOrder(Long orderId, String adminEmail) throws StripeException {
+        log.info("Admin canceling order: orderId={}, adminEmail={}", orderId, adminEmail);
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    log.error("Order not found: orderId={}", orderId);
+                    return new OrderNotFoundException("Order not found with id: " + orderId);
+                });
+
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> {
+                    log.error("Admin user not found: email={}", adminEmail);
+                    return new UserWithGivenEmailForLoginNotFoundException("Admin not found");
+                });
+
+        if (order.getCurrentStatus() == OrderStatus.CANCELED) {
+            log.warn("Order is already canceled: orderId={}", orderId);
+            throw new IllegalStateException("Order is already canceled");
+        }
+
+        if (order.getCurrentStatus() == OrderStatus.COMPLETED) {
+            log.warn("Cannot cancel completed order: orderId={}", orderId);
+            throw new IllegalStateException("Cannot cancel completed order");
+        }
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID && !order.getIsDepositRefunded()) {
+            log.info("Processing refund for orderId={}, paymentIntentId={}", orderId, order.getPaymentIntentId());
+            try {
+                stripeService.refundPayment(order.getPaymentIntentId());
+                order.setIsDepositRefunded(true);
+                order.setPaymentStatus(PaymentStatus.REFUNDED);
+                log.info("Refund successful for orderId={}", orderId);
+            } catch (StripeException e) {
+                log.error("Stripe refund failed for orderId={}: {}", orderId, e.getMessage(), e);
+                throw e;
+            }
+        }
+
+        order.setCurrentStatus(OrderStatus.CANCELED);
+        order.setLastChangedStatusAt(LocalDateTime.now());
+
+        Car car = order.getCar();
+        car.setStatus(CarStatus.AVAILABLE);
+        carRepository.save(car);
+        log.info("Car status changed to AVAILABLE: carId={}", car.getId());
+
+        createOrderStatusHistory(order, OrderStatus.CANCELED, admin);
+
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order canceled successfully: orderId={}", orderId);
+
+        return orderMapper.toOrderAdminDto(savedOrder);
+    }
+
+    @Override
+    public List<OrderAdminDto> getAllOrders() {
+        log.info("Fetching all orders");
+        List<Order> orders = orderRepository.findAll();
+        log.info("Found {} orders", orders.size());
+        return orderMapper.toOrderAdminDtoList(orders);
+    }
+
+    @Override
+    public OrderAdminDto getOrderById(Long orderId) {
+        log.info("Fetching order by id: {}", orderId);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    log.error("Order not found: orderId={}", orderId);
+                    return new OrderNotFoundException("Order not found with id: " + orderId);
+                });
+        return orderMapper.toOrderAdminDto(order);
+    }
+
+    @Transactional
+    public OrderResponseDto confirmOrder(Long orderId) {
+        log.info("Confirming order: orderId={}", orderId);
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    log.error("Order not found: orderId={}", orderId);
+                    return new EntityNotFoundException("Замовлення не знайдено");
+                });
+
+        if (order.getCurrentStatus() != OrderStatus.PROCESSING) {
+            log.warn("Cannot confirm order with status: {}", order.getCurrentStatus());
+            throw new IllegalStateException("Тільки замовлення зі статусом PROCESSING можуть бути підтверджені");
+        }
+
+        // Оновлюємо статус замовлення
+        order.setCurrentStatus(OrderStatus.COMPLETED);
+        order.setLastChangedStatusAt(LocalDateTime.now());
+        log.info("Order status changed to COMPLETED: orderId={}", orderId);
+
+        // Створюємо запис в історію статусів замовлення
+        createOrderStatusHistory(order, OrderStatus.COMPLETED, order.getUser());
+
+        // Оновлюємо статус автомобіля на SOLD
+        Car car = order.getCar();
+        car.setStatus(CarStatus.SOLD);
+        carRepository.save(car);
+        log.info("Car status changed to SOLD: carId={}", car.getId());
+
+        Order savedOrder = orderRepository.save(order);
+        log.info("Order confirmed successfully: orderId={}", orderId);
+        
+        return orderMapper.toOrderResponseDto(savedOrder);
+    }
+    
 }

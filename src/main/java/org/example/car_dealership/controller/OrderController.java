@@ -23,7 +23,7 @@ public class OrderController {
 
 
     @PostMapping(value = {"/reserve", "/reserve/"}) // Підтримка з і без trailing slash
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENT', 'ADMIN')")
     public ResponseEntity<StripeResponseDto> processPayment(@RequestParam Long carId,
                                                             Authentication authentication) {
         log.info("=== ENDPOINT CALLED === Starting reservation process for carId={} by user={}", carId, authentication.getName());
