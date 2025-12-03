@@ -4,6 +4,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.car_dealership.dto.DashboardStatisticsDto;
 import org.example.car_dealership.dto.OrderAdminDto;
 import org.example.car_dealership.dto.OrderForUserDto;
 import org.example.car_dealership.dto.OrderResponseDto;
@@ -21,6 +22,7 @@ import org.example.car_dealership.model.config.car.CarStatus;
 import org.example.car_dealership.model.config.orders.OrderStatus;
 import org.example.car_dealership.model.config.payment.PaymentStatus;
 import org.example.car_dealership.repository.CarRepository;
+import org.example.car_dealership.repository.DashboardStatisticsProjection;
 import org.example.car_dealership.repository.OrderRepository;
 import org.example.car_dealership.repository.OrderStatusHistoryRepository;
 import org.example.car_dealership.repository.UserRepository;
@@ -242,6 +244,32 @@ public class OrderServiceImpl implements OrderService {
                     return new OrderNotFoundException("Order not found with id: " + orderId);
                 });
         return orderMapper.toOrderAdminDto(order);
+    }
+
+    @Override
+    public DashboardStatisticsDto getDashboardStatistics() {
+        log.info("Fetching dashboard statistics");
+
+        DashboardStatisticsProjection projection = orderRepository.getDashboardStatistics();
+
+        if (projection == null) {
+            log.warn("Dashboard statistics not found, returning default zeros");
+            return DashboardStatisticsDto.builder()
+                    .totalSalesValue(BigDecimal.ZERO)
+                    .averageCarPrice(BigDecimal.ZERO)
+                    .availableCarsCount(0L)
+                    .activeTestDrivesCount(0L)
+                    .completedOrdersCount(0L)
+                    .build();
+        }
+
+        return DashboardStatisticsDto.builder()
+                .totalSalesValue(projection.getTotalSalesValue())
+                .averageCarPrice(projection.getAverageCarPrice())
+                .availableCarsCount(projection.getAvailableCarsCount())
+                .activeTestDrivesCount(projection.getActiveTestDrivesCount())
+                .completedOrdersCount(projection.getCompletedOrdersCount())
+                .build();
     }
 
     @Transactional

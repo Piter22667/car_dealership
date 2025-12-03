@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -16,12 +17,13 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "9a47d2e54a7f08359c1bfc52a8643beaa2c1d5f40860726e92e2f8e8ac107915";
-    @Value("${jwt.secret.key:9a47d2e54a7f08359c1bfc52a8643beaa2c1d5f40860726e92e2f8e8ac107915}")
+    @Value("${jwt.secret.key}")
     private String SECRET_KEY;
+//    private final String SECRET_KEY = "9a47d2e54a7f08359c1bfc52a8643beaa2c1d5f40860726e92e2f8e8ac107915";
+
+    public String extractUsername(String jwt) {
         return extractClaim(jwt, Claims::getSubject);
     }
-
 
 
     public <T> T extractClaim(String jwt, Function<Claims, T> claimsResolver) {
@@ -56,7 +58,6 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     } //Метод generateTokens() генерує токен, використовуючи порожню карту claims і деталі користувача.
-
 
 
     public boolean isTokenValid(String jwt, UserDetails userDetails) {

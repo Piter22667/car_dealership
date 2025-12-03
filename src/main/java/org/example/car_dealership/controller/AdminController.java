@@ -2,6 +2,7 @@ package org.example.car_dealership.controller;
 
 import com.stripe.exception.StripeException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.car_dealership.dto.DashboardStatisticsDto;
 import org.example.car_dealership.dto.OrderAdminDto;
 import org.example.car_dealership.dto.OrderResponseDto;
 import org.example.car_dealership.dto.TestDriveAdminDto;
@@ -76,6 +77,13 @@ public class AdminController {
             log.error("Error confirming order: orderId={}", orderId, e);
             return ResponseEntity.badRequest().body("Помилка при підтвердженні замовлення: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/dashboard/general")
+    public ResponseEntity<DashboardStatisticsDto> getDashboardStatistics() {
+        log.info("Admin fetching dashboard statistics");
+        DashboardStatisticsDto statistics = orderService.getDashboardStatistics();
+        return ResponseEntity.ok(statistics);
     }
 
     @GetMapping("/test-drives")

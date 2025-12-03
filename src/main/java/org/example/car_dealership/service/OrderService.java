@@ -5,6 +5,7 @@ import org.example.car_dealership.dto.OrderAdminDto;
 import org.example.car_dealership.dto.OrderForUserDto;
 import org.example.car_dealership.dto.OrderResponseDto;
 import org.example.car_dealership.dto.StripeResponseDto;
+import org.example.car_dealership.dto.DashboardStatisticsDto;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface OrderService {
     OrderAdminDto getOrderById(Long orderId);
 
     OrderResponseDto confirmOrder(Long orderId);
+
+    DashboardStatisticsDto getDashboardStatistics();
 }
