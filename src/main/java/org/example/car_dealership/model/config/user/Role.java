@@ -1,7 +1,7 @@
 package org.example.car_dealership.model.config.user;
 
 public enum Role {
-    CLIENT,
-    ADMIN,
-    SYSTEM
+    ROLE_CLIENT,
+    ROLE_ADMIN,
+    ROLE_SYSTEM
 }

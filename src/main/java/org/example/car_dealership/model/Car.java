@@ -1,18 +1,20 @@
 package org.example.car_dealership.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.example.car_dealership.model.config.car.FuelType;
-import org.example.car_dealership.model.config.car.Interior;
-import org.example.car_dealership.model.config.car.Transmission;
-import org.example.car_dealership.model.config.car.Type;
+import lombok.*;
+import org.example.car_dealership.model.config.car.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "cars")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +23,7 @@ public class Car {
     @Column(length = 100)
     private String brand;
 
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     private Integer year;
@@ -31,10 +34,10 @@ public class Car {
     @Column(length = 100)
     private String manufacturer;
 
-    @Column(name = "registration_number",length = 50, unique = true)
+    @Column(name = "registration_number", length = 50, unique = true)
     private String registrationNumber;
 
-    @Column(name = "engine_volume",precision = 4, scale = 1)
+    @Column(name = "engine_volume", precision = 4, scale = 1)
     private BigDecimal engineVolume;
 
     @Column(name = "engine_power")
@@ -74,16 +77,39 @@ public class Car {
     @Enumerated(EnumType.STRING)
     private Interior interior;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<CarImage> carImages;
+    @Version
+    @Builder.Default
+    private Long version = 0L;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<ServiceHistory> serviceHistories;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Builder.Default
+    private CarStatus status = CarStatus.AVAILABLE;
 
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<TestDrive> testDrives;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    @Builder.Default
+    private List<CarImage> carImages = new ArrayList<>();
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<ServiceHistory> serviceHistories = new ArrayList<>();
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    // вказуємо для уникнення рекурсї між звязками та додаткового завантаження toString через анотації lombok
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<TestDrive> testDrives = new ArrayList<>();
+
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
 
 }
